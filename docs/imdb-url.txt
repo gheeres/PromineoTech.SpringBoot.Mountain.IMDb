@@ -1,0 +1,39 @@
+
+http://myimdb.com/api/v1/
+http://myimdb.com/api/v2/
+
+Create - POST
+Read   - GET
+Update - PUT
+Delete - DELETE
+
+"Convention" -
+/{controller}/{id}
+
+GET /titles                     - Return all titles (movies, tv, etc.)
+                                  SELECT * FROM title;
+GET /titles/{title_id}          - Return a specific title / movie
+                                  SELECT * FROM title WHERE title_id = ?;
+GET /titles?name={search}       - Searchs movies titles by name
+                                  SELECT * FROM title WHERE primary_title 
+                                  LIKE '%search%'
+GET /titles/{title_id}/talent   - Returns all actors/actress for a title
+POST /titles                    - Create a new title.
+PUT /titles/{title_id}          - Updates a title.
+DELETE /titles/{title_id}       - Deletes or removes a title.
+							    
+GET /talents                    - Return all actors/actress
+                                  SELECT * FROM talent;
+GET /talents/{talent_id}        - Get the actor or actress
+                                  SELECT * FROM talent WHERE talent_id = ?
+GET /talents/{talent_id}/movies - Get all the movies that have appeared in
+POST /talents                   - Create a new talent
+                                  { name: 'John Snow', birthYear: 1990 }
+PUT /talents/{talent_id}        - Update a talent
+                                  { name: 'Johnathon Snow' } 
+                                  UPDATE talent SET talent_name = ?
+                                  WHERE talent_id = ?								  
+DELETE /talents/{talent_id}     - Deletes a talent
+
+
+
