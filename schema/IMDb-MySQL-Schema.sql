@@ -20,6 +20,7 @@ use imdb;
 
 -- -----------------------------------------------
 
+drop table if exists title_ratings;
 drop table if exists title_episode;
 drop table if exists title_aka_title_type;
 drop table if exists title_principal;
@@ -130,6 +131,10 @@ alter table talent_title
 add foreign key (talent_id) 
 references talent(talent_id);
 
+alter table talent_title
+add foreign key (title_id) 
+references title(title_id);
+
 create index tal_ttl_title_id_idx on talent_title(title_id);
 
 -- ------------------------------------------------
@@ -143,6 +148,10 @@ create table if not exists title_aka (
   additional_attrs varchar(500),
   is_original_title int,
   primary key (title_id, ord));
+
+alter table title_aka
+add foreign key (title_id) 
+references title(title_id);
 
 alter table title_aka
 add foreign key (region_id) 
@@ -179,6 +188,18 @@ create table if not exists title_principal (
   role_names varchar(1000),
   primary key (title_id, talent_id, ord));
 
+alter table title_principal
+add foreign key (title_id) 
+references title(title_id);
+
+alter table title_principal
+add foreign key (talent_id) 
+references talent(talent_id);
+
+alter table title_principal
+add foreign key (category_id) 
+references category(category_id);
+
 create index ttl_prin_tal_id_idx on title_principal(talent_id);
 
 -- ------------------------------------------------
@@ -188,6 +209,10 @@ create table if not exists title_aka_title_type (
   title_type_id int,
   ord int not null,
   primary key (title_id, title_type_id, ord));
+
+alter table title_aka_title_type
+add foreign key (title_id) 
+references title(title_id);
 
 alter table title_aka_title_type
 add foreign key (title_type_id) 
@@ -202,6 +227,14 @@ create table if not exists title_episode (
   episode_number int,
   primary key (title_id));
 
+alter table title_episode
+add foreign key (title_id) 
+references title(title_id);
+
+alter table title_episode
+add foreign key (parent_title_id) 
+references title(title_id);
+
 create index ttl_epi_par_idx on title_episode(parent_title_id);
 
 -- ------------------------------------------------
@@ -210,4 +243,8 @@ create table if not exists title_ratings (
   title_id varchar(20),
   average_rating decimal(2,1),
   num_votes int,
-  primary key (title_id));
+  primary key (title_id)
+);
+alter table title_ratings
+add foreign key (title_id) 
+references title(title_id);
