@@ -18,4 +18,11 @@ public interface TitleRepository {
    * @return The title if found, otherwise returns null.
    */
   Optional<TitleModel> get(String id);
+
+  /**
+   * Saves the specified title to the backend datasource.
+   * @param title The title to save.
+   * @return The title if successful, otherwise an empty optional.
+   */
+  Optional<TitleModel> save(TitleModel title);
 }

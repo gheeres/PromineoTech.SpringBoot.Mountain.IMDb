@@ -44,4 +44,17 @@ public class DefaultTitleService implements TitleService {
     }
     return null;
   }
+  
+  @Override
+  public TitleModel create(TitleModel newTitle) {
+    if (! TitleModel.isValid(newTitle)) {
+      return null;
+    }
+    
+    Optional<TitleModel> result = repository.save(newTitle);
+    if (result.isPresent()) {
+      return result.get();
+    }
+    return null;
+  }
 }

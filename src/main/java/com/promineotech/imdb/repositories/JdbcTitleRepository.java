@@ -63,4 +63,36 @@ public class JdbcTitleRepository implements TitleRepository {
 
     return Optional.empty();
   }
+
+  @Override
+  public Optional<TitleModel> save(TitleModel title) {
+    if (! TitleModel.isValid(title)) {
+      return Optional.empty();
+    }
+    
+    String sql;
+    Optional<TitleModel> existing = get(title.getId());
+    if (existing.isPresent()) {
+      // UPDATE
+      sql = "UPDATE title SET primary_title = :primary_title, "
+          + "                 start_year = :start_year "
+          + "WHERE title_id = :title_id";
+    }
+    else {
+      // INSERT
+      sql = "INSERT INTO title (title_id,content_type_id,primary_title,start_year) "
+          + "VALUES (:title_id,5,:primary_title,:start_year)";
+    }
+    
+    MapSqlParameterSource parameters = new MapSqlParameterSource();
+    parameters.addValue("primary_title", title.getName());
+    parameters.addValue("start_year",  title.getReleaseYear());
+    parameters.addValue("title_id", title.getId());
+    
+    int rows = provider.update(sql, parameters);
+    if (rows > 0) {
+      return get(title.getId());
+    }
+    return Optional.empty();    
+  }
 }

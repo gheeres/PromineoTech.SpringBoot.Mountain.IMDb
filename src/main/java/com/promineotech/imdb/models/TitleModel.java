@@ -29,4 +29,26 @@ public class TitleModel {
   public void setReleaseYear(int releaseYear) {
     this.releaseYear = releaseYear;
   }
+  
+
+  /**
+   * Checks to see if a title if valid.
+   * @param title The title to validate
+   * @return True if value, false if otherwise.
+   */
+  public static boolean isValid(TitleModel title) {
+    if (title == null) {
+      return false;
+    }
+    
+    if ((title.getId() == null) || (title.getId().isEmpty())) {
+      return false;
+    }
+
+    if ((title.getName() == null) || (title.getName().isEmpty())) {
+      return false;
+    }
+
+    return true;
+  }  
 }

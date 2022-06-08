@@ -33,4 +33,10 @@ public class StaticTitleRepository implements TitleRepository {
     return titles.stream().filter(title -> title.getId().equalsIgnoreCase(id))
                           .findFirst();
   }
+
+  @Override
+  public Optional<TitleModel> save(TitleModel title) {
+    titles.add(title);
+    return Optional.of(title);
+  }
 }

@@ -17,4 +17,11 @@ public interface TitleService {
    * @return The title if found, otherwise returns null.
    */
   TitleModel get(String id);
+  
+  /**
+   * Creates a new title.
+   * @param newTitle The new title information.
+   * @return The created title, or null if failed.
+   */
+  TitleModel create(TitleModel newTitle);
 }
