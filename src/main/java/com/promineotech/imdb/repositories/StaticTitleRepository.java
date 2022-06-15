@@ -29,6 +29,12 @@ public class StaticTitleRepository implements TitleRepository {
   }
 
   @Override
+  public Stream<TitleModel> search(String name, int limit) {
+    // TODO: Incomplete - Should use regular expression.
+    return titles.stream().filter(title -> title.getName().equalsIgnoreCase(name));
+  }
+  
+  @Override
   public Optional<TitleModel> get(String id) {
     return titles.stream().filter(title -> title.getId().equalsIgnoreCase(id))
                           .findFirst();
@@ -36,7 +42,28 @@ public class StaticTitleRepository implements TitleRepository {
 
   @Override
   public Optional<TitleModel> save(TitleModel title) {
+    if (title == null) {
+      return Optional.empty();
+    }
+    
+    return save(title.getId(), title);
+  }
+
+  @Override
+  public Optional<TitleModel> save(String id, TitleModel title) {
+    if (title == null) {
+      return Optional.empty();
+    }
+    
+    // Look up existing title by id,
+    // If existing, update existing values in memory
+    // Otherwise add new title.
     titles.add(title);
     return Optional.of(title);
+  }
+
+  @Override
+  public Optional<TitleModel> remove(String id) {
+    return Optional.empty();
   }
 }

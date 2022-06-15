@@ -42,6 +42,32 @@ public class JdbcTitleRepository implements TitleRepository {
   }
 
   @Override
+  public Stream<TitleModel> search(String name, int limit) {
+    if ((name == null) || (name.isEmpty())) {
+      return all(limit);
+    }
+    
+    String sql = "SELECT title_id,primary_title,start_year FROM title "
+               + "WHERE primary_title LIKE :primary_title "
+               + "LIMIT " + limit + ";";
+    MapSqlParameterSource parameters = new MapSqlParameterSource();
+    parameters.addValue("primary_title", "%" + name + "%");
+    
+    List<TitleModel> titles = provider.query(sql, parameters, new RowMapper<TitleModel>() {
+      @Override
+      public TitleModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+        String id = rs.getString("title_id");
+        String name = rs.getString("primary_title");
+        int releasedYear = rs.getInt("start_year");
+        
+        return new TitleModel(id, name, releasedYear);
+      }
+    });
+
+    return titles.stream();
+  }
+
+  @Override
   public Optional<TitleModel> get(String id) {
     String sql = "SELECT title_id,primary_title,start_year FROM title\n"
                + "WHERE title_id = :title_id;";
@@ -70,29 +96,62 @@ public class JdbcTitleRepository implements TitleRepository {
       return Optional.empty();
     }
     
+     return save(title.getId(), title);  
+  }
+
+  @Override
+  public Optional<TitleModel> save(String id, TitleModel title) {
+    if (! TitleModel.isValid(title)) {
+      return Optional.empty();
+    }
+    
     String sql;
-    Optional<TitleModel> existing = get(title.getId());
+    Optional<TitleModel> existing = get(id);
     if (existing.isPresent()) {
       // UPDATE
-      sql = "UPDATE title SET primary_title = :primary_title, "
+      sql = "UPDATE title SET title_id = :title_id, "
+          + "                 primary_title = :primary_title, "
           + "                 start_year = :start_year "
-          + "WHERE title_id = :title_id";
+          + "WHERE title_id = :existing_title_id";
     }
     else {
       // INSERT
       sql = "INSERT INTO title (title_id,content_type_id,primary_title,start_year) "
-          + "VALUES (:title_id,5,:primary_title,:start_year)";
+          + "VALUES (:title_id,:content_type_id,:primary_title,:start_year)";
     }
     
     MapSqlParameterSource parameters = new MapSqlParameterSource();
     parameters.addValue("primary_title", title.getName());
     parameters.addValue("start_year",  title.getReleaseYear());
     parameters.addValue("title_id", title.getId());
+    parameters.addValue("content_type_id", 5);
+    parameters.addValue("existing_title_id", id);
     
     int rows = provider.update(sql, parameters);
     if (rows > 0) {
       return get(title.getId());
     }
     return Optional.empty();    
+  }
+
+  @Override
+  public Optional<TitleModel> remove(String id) {
+    if ((id == null) || (id.isEmpty())) {
+      return Optional.empty();
+    }
+    
+    Optional<TitleModel> existing = get(id);
+    if (existing.isPresent()) {
+      String sql = "DELETE FROM title WHERE title_id = :title_id;";
+      MapSqlParameterSource parameters = new MapSqlParameterSource();
+      parameters.addValue("title_id", id);
+      
+      int rows = provider.update(sql, parameters);
+      if (rows == 1) {
+        return existing;
+      }
+    }
+    
+    return Optional.empty();
   }
 }

@@ -31,6 +31,24 @@ public class DefaultTitleService implements TitleService {
     return repository.all(limit)
                      .collect(Collectors.toList());
   }
+  
+
+  @Override
+  public List<TitleModel> all(String name, int limit) {
+    if ((name == null) || (name.isEmpty())) {
+      return all(limit);
+    }
+    
+    if (limit <= 0) {
+      return Collections.emptyList();
+    }
+    if (limit > MAX_ITEMS_PER_REQUEST) {
+      limit = MAX_ITEMS_PER_REQUEST;
+    }
+
+    return repository.search(name, limit)
+                     .collect(Collectors.toList());
+  }  
 
   @Override
   public TitleModel get(String id) {
@@ -54,6 +72,32 @@ public class DefaultTitleService implements TitleService {
     Optional<TitleModel> result = repository.save(newTitle);
     if (result.isPresent()) {
       return result.get();
+    }
+    return null;
+  }
+
+  @Override
+  public TitleModel update(String id, TitleModel updatedTitle) {
+    TitleModel existing = get(id);
+    if (existing != null) {
+      if (TitleModel.isValid(updatedTitle)) {
+        Optional<TitleModel> result = repository.save(id, updatedTitle);
+        if (result.isPresent()) {
+          return result.get();
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public TitleModel delete(String id) {
+    TitleModel existing = get(id);
+    if (existing != null) {
+      Optional<TitleModel> result = repository.remove(id);
+      if (result.isPresent()) {
+        return result.get();
+      }
     }
     return null;
   }
